@@ -10,7 +10,7 @@ public class Albañil extends Agent {
 
     }
 
-    public void active() {
+    public void activar() {
         addBehaviour(new TickerBehaviour(this, 1000) {
             @Override
             protected void onTick() {
