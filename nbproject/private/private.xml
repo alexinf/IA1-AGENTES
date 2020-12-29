@@ -3,9 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
             <file>file:/C:/Users/favio/Desktop/IA1-AGENTES/src/agents/Albañil.java</file>
             <file>file:/C:/Users/favio/Desktop/IA1-AGENTES/src/vista/VistaControl.java</file>
             <file>file:/C:/Users/favio/Desktop/IA1-AGENTES/src/vista/VistaInicial.java</file>
+=======
+            <file>file:/C:/Users/Bruno/Documents/NetBeansProjects/IA1-AGENTES/src/agents/Arquitecto.java</file>
+>>>>>>> 3ad4611fa4622591a87298728eb3e2001a9a2293
         </group>
     </open-files>
 </project-private>
