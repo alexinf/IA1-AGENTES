@@ -14,10 +14,11 @@ public class Plomero extends Agent {
     protected void setup() {
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
-            this.jornadasAsignadas = (int) args[0];
+            this.jornadasAsignadas = Integer.parseInt((String) args[0]);
         } else {
             System.out.println("No tiene sus jornadas asignadas asignado");
         }
+        this.activar();
     }
 
     public void activar() {
@@ -29,8 +30,10 @@ public class Plomero extends Agent {
                     msg.setContent("Plomeria acabada");
                     msg.addReceiver(new AID("arquitecto", AID.ISLOCALNAME));
                     send(msg);
-                    block();
+                    System.out.println("Ya acabe mi trabajo plomero");
+                    this.stop();
                 } else {
+                    System.out.println(jornadaActual);
                     jornadaActual++;
                 }
             }
