@@ -1,42 +1,83 @@
 package agents;
 
-import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 
 public class Plomero extends Agent {
 
-    private int jornadasAsignadas;
-    private int jornadaActual = 1;
+    private int jornadas;
+    private double precioJornada;
 
     @Override
     protected void setup() {
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
-            this.jornadasAsignadas = Integer.parseInt((String) args[0]);
+            this.jornadas = Integer.parseInt((String) args[0]);
+            this.precioJornada = Double.parseDouble((String) args[1]);
         } else {
-            System.out.println("No tiene sus jornadas asignadas asignado");
+            System.out.println("No tiene sus jornadas");
+        }
+        DFAgentDescription dfd = new DFAgentDescription();
+        dfd.setName(getAID());
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("plomero");
+        sd.setName("contrato-plomero");
+        dfd.addServices(sd);
+        try {
+            DFService.register(this, dfd);
+        } catch (FIPAException e) {
+            e.printStackTrace();
         }
         this.activar();
     }
 
     public void activar() {
-        addBehaviour(new TickerBehaviour(this, 1000) {
-            @Override
-            public void onTick() {
-                if (jornadaActual == jornadasAsignadas) {
-                    ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                    msg.setContent("Plomeria acabada");
-                    msg.addReceiver(new AID("arquitecto", AID.ISLOCALNAME));
-                    send(msg);
-                    System.out.println("Ya acabe mi trabajo plomero");
-                    this.stop();
-                } else {
-                    System.out.println(jornadaActual);
-                    jornadaActual++;
-                }
+        addBehaviour(new OfertarContrato());
+        addBehaviour(new AceptarContrato());
+    }
+
+    private class OfertarContrato extends CyclicBehaviour {
+
+        @Override
+        public void action() {
+//            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
+            MessageTemplate mt = MessageTemplate.and(MessageTemplate.MatchPerformative(ACLMessage.CFP),
+                    MessageTemplate.MatchConversationId("contrato-plomero"));
+            ACLMessage msg = myAgent.receive(mt);
+            if (msg != null) {
+                // cfp de Arquitecto recibido
+                ACLMessage respuesta = msg.createReply();
+                // el producto solicitado esta disponible, se envia un PROPOSE con el precio del producto
+                respuesta.setPerformative(ACLMessage.PROPOSE);
+                respuesta.setContent(String.valueOf(precioJornada * jornadas));
+                respuesta.setConversationId(msg.getConversationId());
+                myAgent.send(respuesta);
+            } else {
+                block();
             }
-        });
+        }
+    }
+
+    private class AceptarContrato extends CyclicBehaviour {
+
+        @Override
+        public void action() {
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            ACLMessage msg = myAgent.receive(mt);
+            if (msg != null && msg.getContent() != null) {
+                //mensaje de contrato recibido
+                ACLMessage respuesta = msg.createReply();
+                respuesta.setPerformative(ACLMessage.INFORM);
+                myAgent.send(respuesta);
+            } else {
+                block();
+            }
+        }
     }
 }
