@@ -152,7 +152,8 @@ public class Arquitecto extends Agent {
                 case 3:
                     // Recibe el contrato
                     respuesta = myAgent.receive(mt);
-                    if (respuesta != null) {
+                    if (respuesta != null /**&& respuesta.getConversationId().equals("contrato-plomero")**/) {
+                        System.out.println(respuesta.getConversationId());
                         if (respuesta.getPerformative() == ACLMessage.INFORM) {
                             // Contrato exitoso. Podemos terminar
                             System.out.println("Agente " + respuesta.getSender().getName() + " contratado");
@@ -237,6 +238,7 @@ public class Arquitecto extends Agent {
                     // Recibe el contrato
                     respuesta = myAgent.receive(mt);
                     if (respuesta != null) {
+                        System.out.println(respuesta.getConversationId());
                         if (respuesta.getPerformative() == ACLMessage.INFORM) {
                             // Contrato exitoso. Podemos terminar
                             System.out.println("Agente " + respuesta.getSender().getName() + " contratado");
