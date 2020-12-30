@@ -2,6 +2,7 @@ package agents;
 
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -53,7 +54,6 @@ public class Plomero extends Agent {
             if (msg != null) {
                 // cfp de Arquitecto recibido
                 ACLMessage respuesta = msg.createReply();
-                // el producto solicitado esta disponible, se envia un PROPOSE con el precio del producto
                 respuesta.setPerformative(ACLMessage.PROPOSE);
                 respuesta.setContent(String.valueOf(precioJornada * jornadas));
                 respuesta.setConversationId(msg.getConversationId());
@@ -75,6 +75,19 @@ public class Plomero extends Agent {
                 ACLMessage respuesta = msg.createReply();
                 respuesta.setPerformative(ACLMessage.INFORM);
                 myAgent.send(respuesta);
+                addBehaviour(new TickerBehaviour(myAgent, 500) {
+                    private int jornadaActual = 1;
+
+                    @Override
+                    protected void onTick() {
+                        if (jornadaActual == jornadas) {
+                            System.out.println("Trabajo de plomeria Finalizado");
+                            doDelete();
+                        } else {
+                            jornadaActual++;
+                        }
+                    }
+                });
             } else {
                 block();
             }
